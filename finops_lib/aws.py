@@ -24,16 +24,27 @@ class AWSCostProvider(CloudCostProvider):
                 logger.warning(f"AWS initialization failed: {e}, falling back to test mode")
                 self.test_mode = True
 
-    def get_cost_data(self, start_date: str, end_date: str) -> pd.DataFrame:
+    def get_cost_data(self, start_date: str, end_date: str, resource_id: str = None) -> pd.DataFrame:
         if self.test_mode:
             logger.info("Using test data for AWS costs")
-            return self.get_test_data(start_date, end_date, "AWS")
+            return self.get_test_data(start_date, end_date, "AWS", resource_id)
             
         try:
+            # Add resource filter if resource_id is provided
+            filters = {}
+            if resource_id:
+                filters = {
+                    'Dimensions': {
+                        'Key': 'RESOURCE_ID',
+                        'Values': [resource_id]
+                    }
+                }
+
             response = self.client.get_cost_and_usage(
                 TimePeriod={'Start': start_date, 'End': end_date},
                 Granularity='MONTHLY',
-                Metrics=['UnblendedCost']
+                Metrics=['UnblendedCost'],
+                Filter=filters
             )
             # Process real response...
             data = []
@@ -50,4 +61,4 @@ class AWSCostProvider(CloudCostProvider):
             if not self.test_mode:
                 raise
             logger.info("Falling back to test data")
-            return self.get_test_data(start_date, end_date, "AWS")
+            return self.get_test_data(start_date, end_date, "AWS", resource_id)

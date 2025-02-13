@@ -23,12 +23,25 @@ class AzureCostProvider(CloudCostProvider):
                 logger.warning(f"Azure initialization failed: {e}, falling back to test mode")
                 self.test_mode = True
 
-    def get_cost_data(self, start_date: str, end_date: str) -> pd.DataFrame:
+    def get_cost_data(self, start_date: str, end_date: str, resource_id: str = None) -> pd.DataFrame:
         if self.test_mode:
             logger.info("Using test data for Azure costs")
-            return self.get_test_data(start_date, end_date, "Azure")
+            return self.get_test_data(start_date, end_date, "Azure", resource_id)
             
         try:
+            # Add resource filter if resource_id is provided
+            filters = {}
+            if resource_id:
+                filters = {
+                    'dimensions': [
+                        {
+                            'name': 'ResourceId',
+                            'operator': 'In',
+                            'values': [resource_id]
+                        }
+                    ]
+                }
+
             # Real Azure cost management API call would go here
             data = [{"timestamp": start_date, "service": "Azure-RealService", 
                     "cost": 200.0, "currency": "USD", "tags": {}}]
@@ -38,4 +51,4 @@ class AzureCostProvider(CloudCostProvider):
             if not self.test_mode:
                 raise
             logger.info("Falling back to test data")
-            return self.get_test_data(start_date, end_date, "Azure")
+            return self.get_test_data(start_date, end_date, "Azure", resource_id)

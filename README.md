@@ -2,7 +2,7 @@
 
 ## Overview
 
-This Python library is designed to empower FinOps engineers to manage and optimize cloud spending across AWS, Azure, and Google Cloud. It provides real-time cost analysis by querying each cloud’s billing APIs, normalizes the data into a common format, and lays the groundwork for future automation features such as anomaly detection, AI/ML-powered forecasting, and policy enforcement.
+This Python library is designed to empower FinOps engineers to manage and optimize cloud spending across AWS, Azure, and Google Cloud. It provides real-time cost analysis by querying each cloud's billing APIs, normalizes the data into a common format, and lays the groundwork for future automation features such as anomaly detection, AI/ML-powered forecasting, and policy enforcement.
 
 ## Key FinOps Principles
 
@@ -28,6 +28,9 @@ A command-line tool for multi-cloud cost analysis and optimization.
 - **Anomaly Detection:** Identify unusual spending patterns.
 - **Cost Forecasting:** Predict future cloud costs.
 - **Optimization Recommendations:** Get suggestions for reducing cloud spending.
+- **Budget Management:** Set and track budgets for specific teams and projects.
+- **Cost Efficiency Scoring:** Calculate and interpret cost efficiency scores to assess cloud spending efficiency.
+- **Enhanced Reporting:** Generate cost breakdowns by service and region.
 
 ## Installation
 
@@ -77,39 +80,56 @@ finops-cli report --start-date YYYY-MM-DD --end-date YYYY-MM-DD --format [markdo
 - `--test`: Use test data instead of live cloud data.
 - `--export`: Export the report to a file.
 
-### Anomaly Detection
+### Budget Management
 
-Detect cost anomalies within a specified date range:
-
-```bash
-finops-cli anomaly-check --start-date YYYY-MM-DD --end-date YYYY-MM-DD
-```
-
-- `--start-date`: Start date for anomaly detection (YYYY-MM-DD).
-- `--end-date`: End date for anomaly detection (YYYY-MM-DD).
-
-### Cost Forecasting
-
-Produce cost forecasts based on historical data:
+Set a budget for a specific team and project:
 
 ```bash
-finops-cli forecast --start-date YYYY-MM-DD --end-date YYYY-MM-DD --days [number]
+finops-cli set-budget --team TEAM_NAME --project PROJECT_NAME --amount AMOUNT --start-date YYYY-MM-DD --end-date YYYY-MM-DD
 ```
 
-- `--start-date`: Start date for forecasting (YYYY-MM-DD).
-- `--end-date`: End date for forecasting (YYYY-MM-DD).
-- `--days`: Number of days to forecast. Default is 30.
-
-### Optimization Recommendations
-
-Analyze spending patterns and suggest cost optimization opportunities:
+Track spending against the budget:
 
 ```bash
-finops-cli optimize --start-date YYYY-MM-DD --end-date YYYY-MM-DD --test
+finops-cli track-budget --team TEAM_NAME --project PROJECT_NAME --start-date YYYY-MM-DD --end-date YYYY-MM-DD --test
 ```
 
-- `--start-date`: Start date for analysis (YYYY-MM-DD).
-- `--end-date`: End date for analysis (YYYY-MM-DD).
+- `--team`: Team name for the budget.
+- `--project`: Project name for the budget.
+- `--amount`: Budget amount in USD.
+- `--start-date`: Start date for the budget (YYYY-MM-DD).
+- `--end-date`: End date for the budget (YYYY-MM-DD).
+- `--test`: Use test data instead of live cloud data.
+
+### Cost Efficiency Scoring
+
+Calculate and display the cost efficiency score:
+
+```bash
+finops-cli cost-efficiency-score --start-date YYYY-MM-DD --end-date YYYY-MM-DD --forecast FORECAST_AMOUNT --test
+```
+
+- `--start-date`: Start date for the score calculation (YYYY-MM-DD).
+- `--end-date`: End date for the score calculation (YYYY-MM-DD).
+- `--forecast`: Forecasted total spend for the period.
+- `--test`: Use test data instead of live cloud data.
+
+### Enhanced Reporting
+
+Generate a cost breakdown by service:
+
+```bash
+finops-cli cost-by-service --start-date YYYY-MM-DD --end-date YYYY-MM-DD --test
+```
+
+Generate a cost breakdown by region:
+
+```bash
+finops-cli cost-by-region --start-date YYYY-MM-DD --end-date YYYY-MM-DD --test
+```
+
+- `--start-date`: Start date for the report (YYYY-MM-DD).
+- `--end-date`: End date for the report (YYYY-MM-DD).
 - `--test`: Use test data instead of live cloud data.
 
 ## Contributing
