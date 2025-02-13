@@ -9,6 +9,7 @@ from .gcp import GCPCostProvider
 from .anomaly import detect_anomalies
 from .forecast import forecast_costs
 import pandas as pd
+from .optimize import optimize_costs
 
 # Set up logging at module level
 logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(name)s:%(message)s')
@@ -66,6 +67,16 @@ def forecast(start_date, end_date, days):
     forecast_df = forecast_costs(cost_df, n_days=days)
     click.echo("Forecast:")
     click.echo(forecast_df.to_markdown(index=False))
+
+@cli.command()
+@click.option('--start-date', required=True, help='Start date (YYYY-MM-DD)')
+@click.option('--end-date', required=True, help='End date (YYYY-MM-DD)')
+@click.option('--test', is_flag=True, help='Run in test mode with dummy data')
+def optimize(start_date, end_date, test):
+    """Optimize cloud costs."""
+    click.echo("Running cost optimization...")
+    results = optimize_costs(start_date, end_date, test)
+    click.echo(results)
 
 if __name__ == '__main__':
     cli()

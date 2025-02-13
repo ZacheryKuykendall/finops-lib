@@ -16,7 +16,8 @@ dependencies = [
     "pandas",
     "click",
     "scikit-learn",
-    "tabulate"  # Required for pandas to_markdown()
+    "tabulate",
+    "reportlab"
 ]
 
 [project.scripts]
