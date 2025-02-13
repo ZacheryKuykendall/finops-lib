@@ -1,0 +1,2 @@
+# Run the following command to install the package in editable mode:
+pip install -e .

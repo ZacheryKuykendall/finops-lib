@@ -1,0 +1,16 @@
+# Bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment
+venv
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+*.egg
+
+# OS generated files
+.DS_Store
