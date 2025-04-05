@@ -1,0 +1,96 @@
+{
+    "value": [
+        {
+            "id": "/subscriptions/sub-1/providers/Microsoft.Consumption/budgets/EngineeringBudget",
+            "name": "EngineeringBudget",
+            "type": "Microsoft.Consumption/budgets",
+            "properties": {
+                "timePeriod": {
+                    "startDate": "2024-01-01T00:00:00Z",
+                    "endDate": "2024-12-31T23:59:59Z"
+                },
+                "timeGrain": "Monthly",
+                "amount": 5000.0,
+                "currentSpend": {
+                    "amount": 4250.75,
+                    "unit": "USD"
+                },
+                "forecastSpend": {
+                    "amount": 4850.25,
+                    "unit": "USD"
+                },
+                "category": "Cost",
+                "notifications": {
+                    "actual_80_percent": {
+                        "enabled": true,
+                        "operator": "GreaterThan",
+                        "threshold": 80,
+                        "contactEmails": ["engineering-lead@company.com"]
+                    },
+                    "actual_100_percent": {
+                        "enabled": true,
+                        "operator": "GreaterThan",
+                        "threshold": 100,
+                        "contactEmails": ["engineering-lead@company.com", "finance@company.com"]
+                    },
+                    "forecasted_100_percent": {
+                        "enabled": true,
+                        "operator": "GreaterThan",
+                        "threshold": 100,
+                        "contactEmails": ["engineering-lead@company.com"]
+                    }
+                },
+                "filter": {
+                    "dimensions": {
+                        "name": "ResourceGroupName",
+                        "operator": "In",
+                        "values": ["prod-rg", "dev-rg"]
+                    },
+                    "tags": {
+                        "department": ["engineering"]
+                    }
+                }
+            }
+        },
+        {
+            "id": "/subscriptions/sub-2/providers/Microsoft.Consumption/budgets/DevOpsBudget",
+            "name": "DevOpsBudget",
+            "type": "Microsoft.Consumption/budgets",
+            "properties": {
+                "timePeriod": {
+                    "startDate": "2024-01-01T00:00:00Z",
+                    "endDate": "2024-12-31T23:59:59Z"
+                },
+                "timeGrain": "Monthly",
+                "amount": 3000.0,
+                "currentSpend": {
+                    "amount": 2480.30,
+                    "unit": "USD"
+                },
+                "forecastSpend": {
+                    "amount": 2950.75,
+                    "unit": "USD"
+                },
+                "category": "Cost",
+                "notifications": {
+                    "actual_90_percent": {
+                        "enabled": true,
+                        "operator": "GreaterThan",
+                        "threshold": 90,
+                        "contactEmails": ["devops-lead@company.com"]
+                    }
+                },
+                "filter": {
+                    "dimensions": {
+                        "name": "ResourceGroupName",
+                        "operator": "In",
+                        "values": ["staging-rg"]
+                    },
+                    "tags": {
+                        "department": ["devops"]
+                    }
+                }
+            }
+        }
+    ]
+} 

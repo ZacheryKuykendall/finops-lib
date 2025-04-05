@@ -1,0 +1,14 @@
+{
+    "aws_account_id": "",
+    "azure_subscription_id": "YOUR_SUBSCRIPTION_ID",
+    "gcp_project_id": "",
+    "budgets": [
+        {
+            "name": "Azure Development",
+            "amount": 1000.0,
+            "timeGrain": "Monthly",
+            "startDate": "2024-01-01",
+            "endDate": "2024-12-31"
+        }
+    ]
+} 

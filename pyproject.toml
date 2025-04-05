@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "finops_lib"
-version = "1.0.0"
+version = "1.1.0"
 description = "Multi-cloud FinOps Python library for cost analysis"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -17,7 +17,8 @@ dependencies = [
     "click",
     "scikit-learn",
     "tabulate",
-    "reportlab"
+    "reportlab",
+    "flask>=2.0.0"
 ]
 
 [project.scripts]

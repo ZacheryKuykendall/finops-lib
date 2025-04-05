@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinOps Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Date Range Picker -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="bg-blue-600 text-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center">
+                        <span class="text-xl font-bold">FinOps Dashboard</span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <!-- Controls -->
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Date Range</label>
+                        <input type="text" id="daterange" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Forecast Amount ($)</label>
+                        <input type="number" id="forecast" value="1000" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Test Mode</label>
+                        <select id="testMode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <option value="true">Enabled</option>
+                            <option value="false">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Tag Filters -->
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700">Tag Filters</label>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+                        <div>
+                            <input type="text" id="tagKey" placeholder="Tag Key" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <input type="text" id="tagValue" placeholder="Tag Value" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <button onclick="addTagFilter()" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                                Add Tag Filter
+                            </button>
+                        </div>
+                    </div>
+                    <div id="activeTagFilters" class="mt-2 flex flex-wrap gap-2"></div>
+                </div>
+                <div class="mt-4 flex justify-end space-x-4">
+                    <button onclick="getCostReport()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                        Generate Report
+                    </button>
+                    <button onclick="getEfficiencyScore()" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+                        Calculate Efficiency
+                    </button>
+                </div>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="grid grid-cols-1 gap-6 mb-6">
+                <!-- Cloud Provider Costs Chart -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Cost by Cloud Provider</h2>
+                    <canvas id="cloudChart"></canvas>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- Service Costs Chart -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Cost by Service</h2>
+                    <canvas id="serviceChart"></canvas>
+                </div>
+                <!-- Region Costs Chart -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Cost by Region</h2>
+                    <canvas id="regionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Reserved Instance Utilization -->
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Reserved Instance Utilization</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-sm font-medium text-gray-700">Average Utilization</h3>
+                        <p class="text-2xl font-bold text-blue-600 mt-2" id="avgUtilization">-</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-sm font-medium text-gray-700">Total RI Coverage</h3>
+                        <p class="text-2xl font-bold text-green-600 mt-2" id="riCoverage">-</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-sm font-medium text-gray-700">Potential Savings</h3>
+                        <p class="text-2xl font-bold text-purple-600 mt-2" id="potentialSavings">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Budget Integration -->
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Budget Overview</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-sm font-medium text-gray-700">Current Spend vs Budget</h3>
+                        <canvas id="budgetChart"></canvas>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-sm font-medium text-gray-700">Budget Alerts</h3>
+                        <div id="budgetAlerts" class="mt-2">
+                            <!-- Budget alerts will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Efficiency Score Card -->
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Efficiency Score</h2>
+                <div id="scoreContainer" class="hidden">
+                    <div class="flex items-center justify-between">
+                        <div class="text-4xl font-bold text-blue-600" id="efficiencyScore">-</div>
+                        <div class="text-lg text-gray-600" id="scoreMessage">-</div>
+                    </div>
+                    <div class="mt-4">
+                        <h3 class="text-md font-medium text-gray-700 mb-2">Suggestions:</h3>
+                        <ul class="list-disc list-inside text-gray-600" id="suggestions"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Cost Table -->
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Detailed Cost Breakdown</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cloud Provider</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Region</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost ($)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="costTableBody" class="bg-white divide-y divide-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize date range picker
+        $(function() {
+            $('#daterange').daterangepicker({
+                startDate: moment().subtract(30, 'days'),
+                endDate: moment(),
+                locale: {
+                    format: 'YYYY-MM-DD'
+                }
+            });
+        });
+
+        // Tag filter management
+        let activeTagFilters = new Map();
+
+        function addTagFilter() {
+            const key = document.getElementById('tagKey').value.trim();
+            const value = document.getElementById('tagValue').value.trim();
+            
+            if (key && value) {
+                activeTagFilters.set(key, value);
+                updateTagFilterDisplay();
+                document.getElementById('tagKey').value = '';
+                document.getElementById('tagValue').value = '';
+            }
+        }
+
+        function removeTagFilter(key) {
+            activeTagFilters.delete(key);
+            updateTagFilterDisplay();
+        }
+
+        function updateTagFilterDisplay() {
+            const container = document.getElementById('activeTagFilters');
+            container.innerHTML = '';
+            
+            activeTagFilters.forEach((value, key) => {
+                const tag = document.createElement('div');
+                tag.className = 'bg-blue-100 text-blue-800 px-3 py-1 rounded-full flex items-center';
+                tag.innerHTML = `
+                    <span>${key}:${value}</span>
+                    <button onclick="removeTagFilter('${key}')" class="ml-2 text-blue-600 hover:text-blue-800">×</button>
+                `;
+                container.appendChild(tag);
+            });
+        }
+
+        // Chart instances
+        let cloudChart = null;
+        let serviceChart = null;
+        let regionChart = null;
+        let budgetChart = null;
+
+        // Helper function to create/update charts
+        function updateCharts(data) {
+            const colors = [
+                '#3B82F6', '#10B981', '#F59E0B', '#EF4444',
+                '#6366F1', '#8B5CF6', '#EC4899', '#14B8A6'
+            ];
+
+            // Cloud Provider Chart
+            const cloudCtx = document.getElementById('cloudChart').getContext('2d');
+            if (cloudChart) cloudChart.destroy();
+            cloudChart = new Chart(cloudCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(data.cloud_costs),
+                    datasets: [{
+                        label: 'Cost ($)',
+                        data: Object.values(data.cloud_costs),
+                        backgroundColor: colors.slice(0, 3)
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Service Chart
+            const serviceCtx = document.getElementById('serviceChart').getContext('2d');
+            if (serviceChart) serviceChart.destroy();
+            serviceChart = new Chart(serviceCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(data.service_costs),
+                    datasets: [{
+                        label: 'Cost ($)',
+                        data: Object.values(data.service_costs),
+                        backgroundColor: colors
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Region Chart
+            const regionCtx = document.getElementById('regionChart').getContext('2d');
+            if (regionChart) regionChart.destroy();
+            regionChart = new Chart(regionCtx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(data.region_costs),
+                    datasets: [{
+                        data: Object.values(data.region_costs),
+                        backgroundColor: colors
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+
+            // Update table
+            const tableBody = document.getElementById('costTableBody');
+            tableBody.innerHTML = '';
+            data.tabular_data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${row.cloud_provider}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${row.service}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${row.region}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${row.cost.toFixed(2)}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        function updateRIMetrics(data) {
+            const avgUtilization = (data.ri_metrics.average_utilization * 100).toFixed(1);
+            const coverage = (data.ri_metrics.coverage * 100).toFixed(1);
+            const savings = data.ri_metrics.potential_savings.toFixed(2);
+
+            document.getElementById('avgUtilization').textContent = `${avgUtilization}%`;
+            document.getElementById('riCoverage').textContent = `${coverage}%`;
+            document.getElementById('potentialSavings').textContent = `$${savings}`;
+        }
+
+        function updateBudgetData(data) {
+            const budgetCtx = document.getElementById('budgetChart').getContext('2d');
+            if (budgetChart) budgetChart.destroy();
+
+            budgetChart = new Chart(budgetCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.budget_data.map(b => b.name),
+                    datasets: [{
+                        label: 'Current Spend',
+                        data: data.budget_data.map(b => b.currentSpend),
+                        backgroundColor: 'rgba(59, 130, 246, 0.5)'
+                    }, {
+                        label: 'Budget',
+                        data: data.budget_data.map(b => b.amount),
+                        backgroundColor: 'rgba(16, 185, 129, 0.5)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Update budget alerts
+            const alertsContainer = document.getElementById('budgetAlerts');
+            alertsContainer.innerHTML = '';
+            
+            data.budget_data.forEach(budget => {
+                const percentUsed = (budget.currentSpend / budget.amount) * 100;
+                let alertClass = 'text-green-600';
+                if (percentUsed > 90) alertClass = 'text-red-600';
+                else if (percentUsed > 75) alertClass = 'text-yellow-600';
+
+                const alert = document.createElement('div');
+                alert.className = `p-2 ${alertClass}`;
+                alert.textContent = `${budget.name}: ${percentUsed.toFixed(1)}% of budget used`;
+                alertsContainer.appendChild(alert);
+            });
+        }
+
+        // Function to get cost report
+        async function getCostReport() {
+            const dates = $('#daterange').data('daterangepicker');
+            const data = {
+                start_date: dates.startDate.format('YYYY-MM-DD'),
+                end_date: dates.endDate.format('YYYY-MM-DD'),
+                test_mode: document.getElementById('testMode').value === 'true',
+                tags: Object.fromEntries(activeTagFilters)
+            };
+
+            try {
+                const response = await fetch('/api/cost-report', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                updateCharts(result);
+                updateRIMetrics(result);
+                updateBudgetData(result);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Function to get efficiency score
+        async function getEfficiencyScore() {
+            const dates = $('#daterange').data('daterangepicker');
+            const data = {
+                start_date: dates.startDate.format('YYYY-MM-DD'),
+                end_date: dates.endDate.format('YYYY-MM-DD'),
+                forecast: document.getElementById('forecast').value,
+                test_mode: document.getElementById('testMode').value === 'true'
+            };
+
+            try {
+                const response = await fetch('/api/efficiency-score', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                
+                // Update UI
+                document.getElementById('scoreContainer').classList.remove('hidden');
+                document.getElementById('efficiencyScore').textContent = result.score;
+                document.getElementById('scoreMessage').textContent = result.interpretation.message;
+                
+                const suggestionsList = document.getElementById('suggestions');
+                suggestionsList.innerHTML = '';
+                result.interpretation.suggestions.forEach(suggestion => {
+                    const li = document.createElement('li');
+                    li.textContent = suggestion;
+                    suggestionsList.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html> 

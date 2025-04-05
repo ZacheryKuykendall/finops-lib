@@ -20,121 +20,127 @@ This Python library is designed to empower FinOps engineers to manage and optimi
 
 # FinOps CLI
 
-A command-line tool for multi-cloud cost analysis and optimization.
+A command-line tool for FinOps (Cloud Financial Operations) to analyze, optimize, and report on cloud costs.
 
 ## Features
 
-- **Cost Reporting:** Generate detailed cost reports across AWS, Azure, and GCP.
-- **Anomaly Detection:** Identify unusual spending patterns.
-- **Cost Forecasting:** Predict future cloud costs.
-- **Optimization Recommendations:** Get suggestions for reducing cloud spending.
-- **Budget Management:** Set and track budgets for specific teams and projects.
-- **Cost Efficiency Scoring:** Calculate and interpret cost efficiency scores to assess cloud spending efficiency.
-- **Enhanced Reporting:** Generate cost breakdowns by service and region.
+- Multi-cloud cost analysis (AWS, Azure, GCP)
+- Cost reporting by service, region, and resource
+- Cost anomaly detection
+- Cost forecasting
+- Budget tracking and alerts
+- Cost optimization recommendations
+- Resource tagging compliance
+- Comprehensive cost efficiency scoring
+- Resource utilization analysis
+- Idle resource detection
+- Sustainability reporting and carbon footprint analysis
+- Web interface for dashboards and visualizations
 
 ## Installation
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/ZacheryKuykendall/finops-cli.git
-   cd finops-cli
-   ```
+```bash
+# Clone repository
+git clone https://github.com/yourusername/finops-cli.git
+cd finops-cli
 
-2. Create a virtual environment:
-   ```bash
-   python -m venv venv
-   ```
+# Create and activate virtual environment
+python -m venv venv
+.\venv\Scripts\activate  # Windows
+source venv/bin/activate  # Linux/Mac
 
-3. Activate the virtual environment:
-   - On Windows:
-     ```bash
-     venv\Scripts\activate
-     ```
-   - On macOS and Linux:
-     ```bash
-     source venv/bin/activate
-     ```
-
-4. Install the dependencies:
-   ```bash
-   pip install -e .
-   ```
+# Install dependencies
+pip install -r requirements.txt
+```
 
 ## Usage
 
 ```bash
-finops-cli --help
+# Show help
+python -m finops_lib.cli --help
+
+# Generate a cost report
+python -m finops_lib.cli report --start-date 2023-01-01 --end-date 2023-01-31 --test
+
+# Check for cost anomalies
+python -m finops_lib.cli anomaly-check --start-date 2023-01-01 --end-date 2023-01-31 --test
+
+# Generate a cost forecast
+python -m finops_lib.cli forecast --start-date 2023-01-01 --end-date 2023-01-31 --days 30 --test
+
+# Get optimization recommendations
+python -m finops_lib.cli optimize --start-date 2023-01-01 --end-date 2023-01-31 --test
+
+# Analyze resource utilization
+python -m finops_lib.cli resource-utilization --start-date 2023-01-01 --end-date 2023-01-31 --test
+
+# Detect idle resources
+python -m finops_lib.cli idle-resources --start-date 2023-01-01 --end-date 2023-01-31 --test
+
+# Generate comprehensive cost efficiency score
+python -m finops_lib.cli cost-efficiency-score --start-date 2023-01-01 --end-date 2023-01-31 --test
+
+# Generate sustainability report
+python -m finops_lib.cli sustainability-report --start-date 2023-01-01 --end-date 2023-01-31 --test
+
+# Start web interface
+python -m finops_lib.cli web --port 5000
 ```
 
-### Cost Reporting
+## New Commands
 
-Generate cost reports for a specified date range:
+The FinOps CLI has been enhanced with the following new commands:
+
+### Resource Utilization Analysis
 
 ```bash
-finops-cli report --start-date YYYY-MM-DD --end-date YYYY-MM-DD --format [markdown|csv|json] --test
+python -m finops_lib.cli resource-utilization --start-date 2023-01-01 --end-date 2023-01-31 --test
 ```
 
-- `--start-date`: Start date for the report (YYYY-MM-DD).
-- `--end-date`: End date for the report (YYYY-MM-DD).
-- `--format`: Output format (markdown, csv, or json). Default is markdown.
-- `--test`: Use test data instead of live cloud data.
-- `--export`: Export the report to a file.
+Analyzes resource utilization across cloud providers, identifying underutilized resources and calculating potential savings from rightsizing.
 
-### Budget Management
-
-Set a budget for a specific team and project:
+### Idle Resource Detection
 
 ```bash
-finops-cli set-budget --team TEAM_NAME --project PROJECT_NAME --amount AMOUNT --start-date YYYY-MM-DD --end-date YYYY-MM-DD
+python -m finops_lib.cli idle-resources --start-date 2023-01-01 --end-date 2023-01-31 --test
 ```
 
-Track spending against the budget:
+Detects idle resources across cloud providers by analyzing last activity dates, calculating potential cost savings from removing unused resources.
+
+### Cost Efficiency Score
 
 ```bash
-finops-cli track-budget --team TEAM_NAME --project PROJECT_NAME --start-date YYYY-MM-DD --end-date YYYY-MM-DD --test
+python -m finops_lib.cli cost-efficiency-score --start-date 2023-01-01 --end-date 2023-01-31 --test
 ```
 
-- `--team`: Team name for the budget.
-- `--project`: Project name for the budget.
-- `--amount`: Budget amount in USD.
-- `--start-date`: Start date for the budget (YYYY-MM-DD).
-- `--end-date`: End date for the budget (YYYY-MM-DD).
-- `--test`: Use test data instead of live cloud data.
+Generates a comprehensive FinOps score based on multiple metrics aligned with industry standards, including resource utilization, waste percentage, discount coverage, cost allocation, and forecast accuracy.
 
-### Cost Efficiency Scoring
-
-Calculate and display the cost efficiency score:
+### Sustainability Report
 
 ```bash
-finops-cli cost-efficiency-score --start-date YYYY-MM-DD --end-date YYYY-MM-DD --forecast FORECAST_AMOUNT --test
+python -m finops_lib.cli sustainability-report --start-date 2023-01-01 --end-date 2023-01-31 --test
 ```
 
-- `--start-date`: Start date for the score calculation (YYYY-MM-DD).
-- `--end-date`: End date for the score calculation (YYYY-MM-DD).
-- `--forecast`: Forecasted total spend for the period.
-- `--test`: Use test data instead of live cloud data.
+Generates a sustainability report with carbon estimates, sustainability scores, and eco-friendly recommendations based on cloud usage patterns.
 
-### Enhanced Reporting
+## Documentation
 
-Generate a cost breakdown by service:
+For detailed documentation, see the [docs](docs/) directory:
+
+- [Installation Guide](docs/installation.md)
+- [Usage Guide](docs/usage.md)
+- [Configuration](docs/configuration.md)
+- [New Commands](docs/new_commands.md)
+
+## Development
 
 ```bash
-finops-cli cost-by-service --start-date YYYY-MM-DD --end-date YYYY-MM-DD --test
+# Run tests
+python -m unittest discover
+
+# Run specific test
+python -m unittest tests.test_commands.test_new_commands
 ```
-
-Generate a cost breakdown by region:
-
-```bash
-finops-cli cost-by-region --start-date YYYY-MM-DD --end-date YYYY-MM-DD --test
-```
-
-- `--start-date`: Start date for the report (YYYY-MM-DD).
-- `--end-date`: End date for the report (YYYY-MM-DD).
-- `--test`: Use test data instead of live cloud data.
-
-## Contributing
-
-Contributions are welcome! Please see [CONTRIBUTING.md](documentation/CONTRIBUTING.md) for guidelines.
 
 ## License
 
